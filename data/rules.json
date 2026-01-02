@@ -1,1 +1,439 @@
-{}
+{
+  "version": "0.1.0",
+  "project": {
+    "name": "prototype",
+    "notes_source": "prototype notes 3.docx"
+  },
+
+  "assets": {
+    "audio_base_url": "https://charming-empanada-4b586b.netlify.app",
+    "repo_base_url": "https://github.com/bennybof/prototype"
+  },
+
+  "timebase": {
+    "unit": "centiseconds",
+    "format_hint": "mm:ss:cs",
+    "sample_rate_hz": 44100,
+    "wav_bit_depth": 16,
+    "mp3_bitrate_kbps": 320
+  },
+
+  "structure": {
+    "intro_end_time": "00:34:28",
+    "mini_loop_duration": "00:04:29",
+    "full_loop_duration": "00:17:16",
+    "full_loops_count": 8,
+
+    "intro_rule": {
+      "id": "intro_section",
+      "file": "audio/stems/intro_section.wav",
+      "roll": { "scope": "global", "probability": 0.9 },
+      "anchor": { "type": "track_start" }
+    },
+
+    "loops_start_rule": {
+      "if_intro_selected_start_at": "00:34:28",
+      "if_intro_not_selected_start_at": "00:00:00",
+      "if_intro_not_selected_master_fade_in": {
+        "type": "linear_gain_ramp",
+        "from_gain": 0.0,
+        "to_gain": 1.0,
+        "duration": "00:17:16"
+      }
+    },
+
+    "extra_segment_rule": {
+      "id": "extra_full_loop_if_secret_lyric",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "trigger": { "type": "after_full_loops_plus", "full_loops": 4, "plus_half_loop": true },
+      "effect": {
+        "type": "insert_extra_segment",
+        "segment_length": "00:17:16",
+        "description": "Implemented as: play second half of a full loop + first half of next = one extra full loop"
+      },
+      "when_selected": {
+        "events": [
+          {
+            "type": "play_stem_once",
+            "file": "audio/stems/secret_lyric.wav",
+            "anchor": { "type": "extra_segment_start" },
+            "offset": "00:01:08"
+          },
+          {
+            "type": "shift_stem_start_time",
+            "target_stem_id": "vox_section_2",
+            "shift_by": "00:17:16"
+          }
+        ]
+      }
+    }
+  },
+
+  "secrets": {
+    "bypass_versions": [
+      {
+        "id": "rickroll",
+        "file": "audio/secret_versions/rickroll.wav",
+        "probability": 0.01,
+        "bypass_all_other_logic": true,
+        "metadata_tags": {
+          "secret_version": "rickroll"
+        }
+      }
+    ]
+  },
+
+  "ui": {
+    "background_default": {
+      "type": "video",
+      "file": "videos/bground.mp4",
+      "loop": true
+    },
+
+    "buttons": {
+      "mp3": { "image": "images/download_mp3.png" },
+      "wav": { "image": "images/download_wav.png" },
+
+      "random_placement": {
+        "enabled": true,
+        "margin_px": 24,
+        "avoid_top_fraction": 0.15,
+        "max_attempts": 50,
+        "fallback": "default_positions"
+      }
+    },
+
+    "on_download_pressed": {
+      "play_sounds": [
+        { "file": "audio/ui_sfx/exponential.wav", "gain_db": -12, "probability": 1.0 },
+        {
+          "choose_one": [
+            { "file": "audio/ui_sfx/blip_water.wav", "probability": 0.5 },
+            { "file": "audio/ui_sfx/13_chimes.wav", "probability": 0.5 }
+          ]
+        }
+      ]
+    },
+
+    "visual_triggers": [
+      {
+        "id": "cave_version_popup",
+        "when": { "fx_flag_enabled": "convolution_reverb_vox" },
+        "action": {
+          "type": "popup_image",
+          "file": "images/cave_version.png",
+          "grow_duration": "00:00:20",
+          "hold_duration_seconds": 2,
+          "shrink_duration": "00:00:20",
+          "from_scale": 0.0,
+          "to_scale": 1.0
+        }
+      },
+      {
+        "id": "secret_version_background",
+        "when": { "stem_selected": "secret_lyric" },
+        "action": {
+          "type": "replace_background",
+          "file": "images/secret_version_background.png"
+        }
+      }
+    ]
+  },
+
+  "stems": [
+    {
+      "id": "bee_pipes",
+      "file": "audio/stems/bee_pipes.wav",
+      "roll": { "scope": "global", "probability": 1.0 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 2, 3, 4], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth",
+      "file": "audio/stems/synth.wav",
+      "roll": { "scope": "global", "probability": 1.0 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 3], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "bass",
+      "file": "audio/stems/bass.wav",
+      "roll": { "scope": "global", "probability": 1.0 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 3], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "pre_snare",
+      "file": "audio/stems/pre_snare.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.8 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [2, 4], "scope": "each_full_loop" }
+      ],
+      "conditional_modifiers": [
+        {
+          "when": { "stem_not_selected_in_loop": "oh_rev" },
+          "apply": {
+            "type": "gain_db",
+            "value_db": 3,
+            "non_cumulative": true,
+            "scope": "that_full_loop_only"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "bee_pops",
+      "file": "audio/stems/bee_pops.wav",
+      "roll": { "scope": "global", "probability": 0.8 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 2, 3, 4], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_high",
+      "file": "audio/stems/synth_high.wav",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "if_selected_then_roll": { "scope": "per_full_loop", "probability": 0.8 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 3], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "chimes",
+      "file": "audio/stems/chimes.wav",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 3], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "oh_rev",
+      "file": "audio/stems/oh_rev.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.8 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:04:02", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "hats_bundle",
+      "files": [
+        "audio/stems/main_hats.wav",
+        "audio/stems/ghosty_hats.wav",
+        "audio/stems/crash.wav",
+        "audio/stems/crash_rev.wav"
+      ],
+      "roll": { "scope": "global", "probability": 0.9 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ],
+      "all_or_none": true
+    },
+
+    {
+      "id": "beeps",
+      "file": "audio/stems/beeps.wav",
+      "roll": { "scope": "global", "probability": 0.6 },
+      "if_selected_then_roll": { "scope": "per_full_loop", "probability": 0.5 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "vlins_2",
+      "file": "audio/stems/vlins_2.wav",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:07:50", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "vlins",
+      "file": "audio/stems/vlins.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.2 },
+      "requires": ["vlins_2"],
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "main_breathe_vox",
+      "file": "audio/stems/main_breathe_vox.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.9 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:07:53", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "breathe_vox_2",
+      "file": "audio/stems/breathe_vox_2.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.5 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:05:41", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "breathe_stutt",
+      "file": "audio/stems/breathe_stutt.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.5 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "breathing",
+      "file": "audio/stems/breathing.wav",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:08:20", "scope": "each_full_loop" },
+        { "type": "full_loop_offset", "offset": "00:15:77", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_glitch_1",
+      "file": "audio/stems/synth_glitch_1.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.1 },
+      "triggers": [
+        { "type": "full_loop_offset", "offset": "00:02:14", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_glitch_2",
+      "file": "audio/stems/synth_glitch_2.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.1 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_glitch_3",
+      "file": "audio/stems/synth_glitch_3.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.1 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_glitch_4",
+      "file": "audio/stems/synth_glitch_4.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.1 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "synth_glitch_5",
+      "file": "audio/stems/synth_glitch_5.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.1 },
+      "triggers": [
+        { "type": "full_loop_start", "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "pad_2",
+      "file": "audio/stems/pad_2.wav",
+      "roll": { "scope": "global", "probability": 0.5 },
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [1, 2, 4], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "pad",
+      "file": "audio/stems/pad.wav",
+      "roll": { "scope": "per_full_loop", "probability": 0.5 },
+      "requires": ["pad_2"],
+      "triggers": [
+        { "type": "mini_loop_start", "mini_loops": [3], "scope": "each_full_loop" }
+      ]
+    },
+
+    {
+      "id": "vox_section_1",
+      "file": "audio/stems/vox_section_1.wav",
+      "roll": { "scope": "global", "probability": 1.0 },
+      "triggers": [
+        { "type": "after_full_loops", "full_loops": 2, "offset": "00:00:26" }
+      ]
+    },
+
+    {
+      "id": "vox_section_2",
+      "file": "audio/stems/vox_section_2.wav",
+      "roll": { "scope": "global", "probability": 1.0 },
+      "triggers": [
+        { "type": "after_full_loops", "full_loops": 4, "offset": "00:12:32" }
+      ]
+    },
+
+    {
+      "id": "breathe_out",
+      "file": "audio/stems/breathe_out.mp3",
+      "roll": { "scope": "global", "probability": 0.2 },
+      "triggers": [
+        {
+          "type": "after_full_loops_plus",
+          "full_loops": 3,
+          "plus_mini_loops": 1,
+          "offset": "00:03:21",
+          "anchor": "loops_start"
+        }
+      ]
+    }
+  ],
+
+  "fx": {
+    "lfo": {
+      "id": "global_blended_lfo",
+      "scope": "entire_track",
+      "type": "average",
+      "sources": [
+        { "type": "sine", "rate_hz": 0.25 },
+        { "type": "smoothed_random", "rate_hz": 0.25 }
+      ],
+      "output_range": [-0.2, 0.2],
+      "targets": [
+        { "stem_id": "breathing", "param": "gain", "mapping": "additive" },
+        { "stem_id": "beeps", "param": "pan", "mapping": "additive" }
+      ]
+    },
+
+    "global_pan_flip_for_vlins": {
+      "roll": { "scope": "global", "probability": 0.5 },
+      "if_true_pan": 0.64,
+      "else_pan": -0.64,
+      "targets": ["vlins", "vlins_2"]
+    },
+
+    "convolution_reverb_vox": {
+      "id": "convolution_reverb_vox",
+      "roll": { "scope": "global", "probability": 0.2 },
+      "impulse_response": "audio/ir/imp_cave_chamber.mp3",
+      "apply_to_selected_stems_where_filename_includes": "vox",
+      "wet_gain_db": -20
+    }
+  }
+}
+
