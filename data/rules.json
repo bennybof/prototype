@@ -430,7 +430,7 @@
     "convolution_reverb_vox": {
       "id": "convolution_reverb_vox",
       "roll": { "scope": "global", "probability": 0.2 },
-      "impulse_response": "audio/ir/imp_cave_chamber.mp3",
+      "impulse_response": "https://breatheinandbreatheout.netlify.app/audio/ir/imp_cave_chamber.mp3",
       "apply_to_selected_stems_where_filename_includes": "vox",
       "wet_gain_db": -20
     }
