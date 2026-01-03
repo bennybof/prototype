@@ -92,15 +92,26 @@
   // Fetch + decode audio
   // -------------------------
   async function fetchArrayBuffer(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
-    return await res.arrayBuffer();
+  const res = await fetch(url);
+  const ct = res.headers.get("content-type") || "(no content-type)";
+  console.log("[fetch]", res.status, ct, url);
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Fetch failed ${res.status} for ${url} (content-type: ${ct}) ${text.slice(0, 80)}`);
   }
 
-  async function decodeToBuffer(audioCtxLike, url) {
+  return await res.arrayBuffer();
+}
+
+async function decodeToBuffer(audioCtxLike, url) {
+  try {
     const arr = await fetchArrayBuffer(url);
     return await audioCtxLike.decodeAudioData(arr.slice(0));
+  } catch (e) {
+    throw new Error(`DECODE FAILED for ${url} :: ${e.message || e}`);
   }
+}
 
   // -------------------------
   // WAV encoding (PCM 16-bit)
