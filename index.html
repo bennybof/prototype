@@ -1,1 +1,41 @@
-placeholder
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generative Download</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Optional: MP3 export support (lamejs). If you don't want MP3 yet, remove this line. -->
+  <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+</head>
+
+<body>
+  <!-- Background video (optional). If you aren't using video, you can delete this block. -->
+  <video id="bgVideo" class="bg-video" autoplay muted loop playsinline>
+    <source src="videos/bground.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Visual layer for popups -->
+  <div id="visualLayer" class="visual-layer" aria-hidden="true"></div>
+
+  <!-- Status text (debug/info) -->
+  <div id="statusText" class="status">Loading…</div>
+
+  <!-- Buttons -->
+  <button id="btnDownloadMp3" class="btn btn-mp3" type="button" aria-label="Download MP3">
+    <img src="images/download_mp3.png" alt="Download MP3" />
+  </button>
+
+  <button id="btnDownloadWav" class="btn btn-wav" type="button" aria-label="Download WAV">
+    <img src="images/download_wav.png" alt="Download WAV" />
+  </button>
+
+  <button id="btnRefresh" class="btn btn-refresh" type="button" aria-label="Refresh version">
+    <img src="images/refresh.png" alt="Refresh" />
+  </button>
+
+  <script src="main.js"></script>
+</body>
+</html>
+
