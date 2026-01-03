@@ -105,7 +105,7 @@
 
     "on_download_pressed": {
       "play_sounds": [
-        { "file": "audio/ui_sfx/exponential.wav", "gain_db": -12, "probability": 1.0 },
+        { "file": "/audio/ui_sfx/exponential.wav", "gain_db": -12, "probability": 1.0 },
         {
           "choose_one": [
             { "file": "audio/ui_sfx/blip_water.wav", "probability": 0.5 },
