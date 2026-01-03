@@ -1,1 +1,83 @@
+/* Full-screen, no-scroll layout */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  /* Use dvh when available to avoid mobile address-bar jumping */
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Background video fills the viewport */
+.bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Visual popups sit above background */
+.visual-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none; /* popups won't block clicks */
+}
+
+/* Status text (small debug area) */
+.status {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 3;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: rgba(255,255,255,0.85);
+  background: rgba(0,0,0,0.45);
+  border-radius: 10px;
+  max-width: min(520px, 90vw);
+  user-select: none;
+}
+
+/* Buttons (positioned by JS) */
+.btn {
+  position: absolute; /* JS sets left/top */
+  z-index: 4;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn img {
+  display: block;
+  height: 64px;   /* adjust if your PNGs are bigger/smaller */
+  width: auto;
+}
+
+/* Slight hover feedback */
+.btn:hover img {
+  filter: brightness(1.08);
+}
+
+.btn:active img {
+  transform: scale(0.98);
+}
+
+/* Mobile: scale buttons down a bit */
+@media (max-width: 600px) {
+  .btn img {
+    height: 52px;
+  }
+  .status {
+    font-size: 11px;
+  }
+}
 
