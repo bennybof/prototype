@@ -622,7 +622,7 @@ async function decodeToBuffer(audioCtxLike, url) {
     let convolver = null, convWet = null;
     if (plan.convolutionEnabled) {
       const fx = rules.fx.convolution_reverb_vox;
-      const irUrl = rules.assets.audio_base_url.replace(/\/$/, "") + "/" + fx.impulse_response;
+      const irUrl = fx.impulse_response;
       setStatus("Loading impulse response...");
       const irBuf = await decodeToBuffer(offline, irUrl);
 
@@ -966,7 +966,18 @@ async function decodeToBuffer(audioCtxLike, url) {
 
   function tryTriggerDecisionVisuals(rules, plan) {
     const vts = rules?.ui?.visual_triggers ?? [];
-    for (const vt of vts) {
+    for (const vt of vts) {    // NEW: allow "when": { "always": true } for testing
+    if (vt?.when?.always === true) {
+      const action = vt.action;
+      if (action?.type === "popup_image") {
+        popupImage({
+          file: action.file,
+          holdSeconds: action.hold_duration_seconds ?? 2
+        });
+      }
+      continue;
+    }
+
       if (vt?.when?.fx_flag_enabled === "convolution_reverb_vox") {
         if (plan.convolutionEnabled) {
           const action = vt.action;
@@ -976,15 +987,27 @@ async function decodeToBuffer(audioCtxLike, url) {
         }
       }
       if (vt?.when?.stem_selected === "secret_lyric") {
-        // only if extraInserted (secret_lyric is played)
-        if (plan.extraInserted) {
-          // If you have a background element, you could swap it here
-          // For now: show a quick popup
-          popupImage({ file: vt.action?.file, holdSeconds: 2 });
+  if (plan.extraInserted) {
+    const action = vt.action;
+    if (action?.type === "replace_background") {
+      replaceBackgroundImage(action.file);
+    }
         }
       }
     }
   }
+function replaceBackgroundImage(path) {
+  const video = document.getElementById("bgVideo");
+  if (video) {
+    video.pause();
+    video.style.display = "none";
+  }
+
+  document.body.style.backgroundImage = `url(${path})`;
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center";
+  document.body.style.backgroundRepeat = "no-repeat";
+}
 
   // -------------------------
   // UI SFX (real-time) for button clicks
@@ -1044,6 +1067,17 @@ async function decodeToBuffer(audioCtxLike, url) {
 
     currentSeed = decideSeed();
     currentPlan = buildSelectionPlan(rules, currentSeed);
+// reset to default background first (video visible)
+const bgV = document.getElementById("bgVideo");
+if (bgV) {
+  bgV.style.display = "";
+  bgV.play().catch(() => {});
+}
+document.body.style.backgroundImage = "";
+
+// trigger decision-time visuals on refresh (not just on download)
+tryTriggerDecisionVisuals(rules, currentPlan);
+
 
     // Place buttons deterministically by seed
     randomPlaceButtons(rules, makeRandFromSeed(currentSeed));
