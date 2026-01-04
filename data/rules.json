@@ -86,13 +86,13 @@
   "ui": {
     "background_default": {
       "type": "video",
-      "file": "videos/bground.mp4",
+      "file": "videos/backgrounds/bground.mp4",
       "loop": true
     },
 
     "buttons": {
-      "mp3": { "image": "images/download_mp3.png" },
-      "wav": { "image": "images/download_wav.png" },
+      "mp3": { "image": "images/visuals/download_mp3.png" },
+      "wav": { "image": "images/visuals/download_wav.png" },
 
       "random_placement": {
         "enabled": true,
@@ -121,7 +121,7 @@
         "when": { "fx_flag_enabled": "convolution_reverb_vox" },
         "action": {
           "type": "popup_image",
-          "file": "images/cave_version.png",
+          "file": "images/visuals/cave_version.png",
           "grow_duration": "00:00:20",
           "hold_duration_seconds": 2,
           "shrink_duration": "00:00:20",
@@ -130,11 +130,11 @@
         }
       },
       {
-        "id": "secret_version_background",
+        "id": "secret_version_bground",
         "when": { "stem_selected": "secret_lyric" },
         "action": {
           "type": "replace_background",
-          "file": "images/secret_version_background.png"
+          "file": "images/backgrounds/secret_version_bground.png"
         }
       }
     ]
@@ -390,7 +390,7 @@
 
     {
       "id": "breathe_out",
-      "file": "audio/stems/breathe_out.mp3",
+      "file": "audio/stems/breathe_out.wav",
       "roll": { "scope": "global", "probability": 0.2 },
       "triggers": [
         {
@@ -429,8 +429,8 @@
 
     "convolution_reverb_vox": {
       "id": "convolution_reverb_vox",
-      "roll": { "scope": "global", "probability": 0 },
-      "impulse_response": "https://breatheinandbreatheout.netlify.app/audio/ir/imp_cave_chamber.mp3",
+      "roll": { "scope": "global", "probability": 0.1 },
+      "impulse_response": "audio/ir/imp_cave_chamber.mp3",
       "apply_to_selected_stems_where_filename_includes": "vox",
       "wet_gain_db": -20
     }
